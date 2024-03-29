@@ -18,4 +18,5 @@ class Board {
     int fullMoveCounter;
     int enPassentSquare;
     void readFen(const std::string& fen);
+    static std::string fieldToString(int square);
 };

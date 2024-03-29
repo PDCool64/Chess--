@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <iostream>
 
 class Piece {
    private:
@@ -8,7 +9,7 @@ class Piece {
     Piece();
     ~Piece();
     /*
-    WBPPP 
+    WBPPP
     000 -> Empty
     001 -> Rook
     010 -> Knight
@@ -26,6 +27,7 @@ class Piece {
     static const int PAWN = 6;
     static const int BLACK = 8;
     static const int WHITE = 16;
+    static const int PIECE_MASK = 0b111;
     static const std::array<int, 8> offsets;
 
     static int fromChar(char c);

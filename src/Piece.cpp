@@ -1,6 +1,8 @@
 #include "Piece.hpp"
 
-const std::array<int, 8> Piece::offsets = {-9, -7, 7, 9, 8, 1, -1, -8};
+// clang-format off
+const std::array<int, 8> Piece::offsets = {-9, -7, 7,  9, 8,  1,  -1, -8};
+// clang-format on
 
 Piece::Piece() {}
 Piece::~Piece() {}
@@ -10,6 +12,8 @@ int Piece::fromChar(char c) {
     if (c > 'Z') {
         res |= Piece::BLACK;
         c -= 32;
+    } else {
+        res |= Piece::WHITE;
     }
     switch (c) {
         case 'P':
@@ -36,10 +40,8 @@ int Piece::fromChar(char c) {
 
 char Piece::toChar(int piece) {
     bool black = piece & Piece::BLACK;
-    if (piece & Piece::BLACK) {
-        piece ^= Piece::BLACK;
-    }
-    switch (piece) {
+    // remove color from piece
+    switch (piece & Piece::PIECE_MASK) {
         case Piece::PAWN:
             return 'P' + (black ? 32 : 0);
         case Piece::KNIGHT:

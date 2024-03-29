@@ -7,13 +7,11 @@ Move::Move(int startSqare, int targetSqare) {
     state |= (targetSqare << 6) & TARGET_SQUARE_MASK;
 }
 
-Move::~Move() { std::cout << "Move destroyed" << std::endl; }
+Move::~Move() {}
 
 int Move::getStartSqare() { return state & STARTSQUARE_MASK; }
 
-int Move::getTargetSquare() {
-    return (state & TARGET_SQUARE_MASK) >> 6;
-}
+int Move::getTargetSquare() { return (state & TARGET_SQUARE_MASK) >> 6; }
 
 int Move::getEnPassentSquare() {
     return (state & EN_PASSENT_SQUARE_MASK) >> 12;
@@ -27,9 +25,7 @@ int Move::getIsQueenSideCastle() {
     return (state & QUEEN_SIDE_CASTLE_MASK) >> 18;
 }
 
-int Move::getPromotionPiece() {
-    return (state & PROMOTION_MASK) >> 20;
-}
+int Move::getPromotionPiece() { return (state & PROMOTION_MASK) >> 20; }
 
 int Move::getIsEnPassent() { return getEnPassentSquare() != 0; }
 
@@ -41,13 +37,9 @@ std::string Move::toString() {
     return str;
 }
 
-int Move::getIsCapture() {
-    return (state & IS_CAPTURE_MASK) >> 29;
-}
+int Move::getIsCapture() { return (state & IS_CAPTURE_MASK) >> 29; }
 
-int Move::getCapturedPiece() {
-    return (state & CAPTURED_PIECE_MASK) >> 24;
-}
+int Move::getCapturedPiece() { return (state & CAPTURED_PIECE_MASK) >> 24; }
 
 void Move::setPromotionPiece(char piece) {
     // clear the promotion bits
@@ -71,8 +63,7 @@ void Move::setQueenSideCastle(bool isQueenSideCastle) {
 void Move::setKingSideCastle(bool isKingSideCastle) {
     // clear the king side castle bit
     state &= ~KING_SIDE_CASTLE_MASK;
-    // shift the isKingSideCastle to the correct position and set
-    // the bit
+    // shift the isKingSideCastle to the correct position and set the bit
     state |= isKingSideCastle << 19;
 }
 

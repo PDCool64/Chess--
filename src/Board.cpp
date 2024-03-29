@@ -45,3 +45,10 @@ void Board::readFen(const std::string& fen) {
     // 6. Parse fullmove number
     iss >> fullMoveCounter;
 }
+
+std::string Board::fieldToString(int square) {
+    std::string str = "";
+    str += 'a' + square % 8;
+    str += '1' + square / 8;
+    return str;
+}

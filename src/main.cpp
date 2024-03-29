@@ -9,9 +9,9 @@
 #include "Piece.hpp"
 
 void printBoard(Board board) {
-    for (int i = 7; i >= 0; --i) {
+    for (int i = 7; i >= 0; --i) { 
         for (int j = 7; j >= 0; --j) {
-            std::cout << board.pieces[i * 8 + j] << " ";
+            std::cout << Piece::toChar(board.pieces[i * 8 + j]) << " ";
         }
         std::cout << std::endl;
     }
