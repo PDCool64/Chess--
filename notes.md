@@ -2,7 +2,7 @@
 
 ## Move
 32 bits:  
-_00cC CCCC PPPP kqEE EEEE TTTT TTSS SSSS_  
+_TTTC CCCC PPPP kqEE EEEE TTTT TTSS SSSS_  
 upper case -> number
 lower case -> boolean 
 from end to start:
@@ -16,7 +16,6 @@ from end to start:
     third bit: Bishop
     fourth bit: Knight
     if all are 0, then it is a normal move
-- 6 bits: Captured
+- 5 bits: Captured
     - 0-5: type
-    - 6ths bit: is capture move or not
-
+- 3 bits: type of piece

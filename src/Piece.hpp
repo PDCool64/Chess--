@@ -32,4 +32,5 @@ class Piece {
 
     static int fromChar(char c);
     static char toChar(int piece);
+    static bool isSameColor(char piece1, char piece2);
 };

@@ -1,3 +1,6 @@
+#pragma once
+
+#include <bitset>
 #include <list>
 
 #include "Board.hpp"
@@ -12,6 +15,8 @@ class MoveGenerator {
     static std::list<Move> generatePawnMoves(Board board, char square);
     static std::list<Move> generateKnightMoves(Board board, char square);
     static std::list<Move> generateDiagonalMoves(Board board, char square);
+    static std::list<Move> generateDiagonalMoves(Board board, char square, int limit);
     static std::list<Move> generateStraightMoves(Board board, char square);
+    static std::list<Move> generateStraightMoves(Board board, char square, int limit);
     static std::list<Move> generateKingMoves(Board board, char square);
 };

@@ -57,3 +57,7 @@ char Piece::toChar(int piece) {
     }
     return ' ';
 }
+
+bool Piece::isSameColor(char piece1, char piece2) {
+    return (piece1 & Piece::WHITE) == (piece2 & Piece::WHITE);
+}

@@ -6,7 +6,8 @@
 class Move {
    public:
     Move();
-    Move(int a, int b);
+    Move(int startSquare, int targetSquare);
+    Move(int startSquare, int targetSquare, int piece);
     ~Move();
     // 0000 0000 PPPP KQEE EEEE TTTT TTSS SSSS
     //  P -> Promotion Piece
@@ -23,7 +24,7 @@ class Move {
     static const int KING_SIDE_CASTLE_MASK = 0b1 << 19;
     static const int PROMOTION_MASK = 0b1111 << 20;
     static const int CAPTURED_PIECE_MASK = 0b11111 << 24;
-    static const int IS_CAPTURE_MASK = 1 << 29;
+    static const int PIECE_TYPE_MASK = 0b111 << 29;
 
     int getStartSqare();
 
@@ -39,7 +40,7 @@ class Move {
 
     int getIsEnPassent();
 
-    int getIsCapture();
+    int getPieceType();
 
     int getCapturedPiece();
 
@@ -57,7 +58,7 @@ class Move {
 
     void setCapturedPiece(int piece);
 
-    void setIsCapture(bool isCapture);
+    void setPieceType(int piece);
 
     std::string toString();
 };

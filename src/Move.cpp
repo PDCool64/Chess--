@@ -1,10 +1,18 @@
 #include "Move.hpp"
 
+#include "Board.hpp"
+
 Move::Move() {}
 
 Move::Move(int startSqare, int targetSqare) {
     state |= (startSqare & STARTSQUARE_MASK);
     state |= (targetSqare << 6) & TARGET_SQUARE_MASK;
+}
+
+Move::Move(int startSqare, int targetSqare, int pieceType) {
+    state |= (startSqare & STARTSQUARE_MASK);
+    state |= (targetSqare << 6) & TARGET_SQUARE_MASK;
+    state |= (pieceType << 29) & PIECE_TYPE_MASK;
 }
 
 Move::~Move() {}
@@ -31,13 +39,17 @@ int Move::getIsEnPassent() { return getEnPassentSquare() != 0; }
 
 std::string Move::toString() {
     std::string str = "";
-    str += std::to_string(getStartSqare());
+    if (getIsKingSideCastle())
+        return "O-O";
+    if (getIsQueenSideCastle())
+        return "O-O-O";
+    str += Board::fieldToString(getStartSqare());
     str += " ";
-    str += std::to_string(getTargetSquare());
+    str += Board::fieldToString(getTargetSquare());
     return str;
 }
 
-int Move::getIsCapture() { return (state & IS_CAPTURE_MASK) >> 29; }
+int Move::getPieceType() { return (state & PIECE_TYPE_MASK) >> 29; }
 
 int Move::getCapturedPiece() { return (state & CAPTURED_PIECE_MASK) >> 24; }
 
@@ -75,4 +87,14 @@ void Move::setStartSquare(int square) {
 void Move::setTargetSquare(int square) {
     state &= ~TARGET_SQUARE_MASK;
     state |= (square << 6) & TARGET_SQUARE_MASK;
+}
+
+void Move::setCapturedPiece(int piece) {
+    state &= ~CAPTURED_PIECE_MASK;
+    state |= (piece << 24) & CAPTURED_PIECE_MASK;
+}
+
+void Move::setPieceType(int piece) {
+    state &= ~PIECE_TYPE_MASK;
+    state |= (piece << 29) & PIECE_TYPE_MASK;
 }
