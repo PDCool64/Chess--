@@ -19,23 +19,29 @@ Move::~Move() {}
 
 int Move::getStartSqare() { return state & STARTSQUARE_MASK; }
 
-int Move::getTargetSquare() { return (state & TARGET_SQUARE_MASK) >> 6; }
-
-int Move::getEnPassentSquare() {
-    return (state & EN_PASSENT_SQUARE_MASK) >> 12;
+int Move::getTargetSquare() {
+    return (state & TARGET_SQUARE_MASK) >> TARGET_SQUARE_SHIFT;
 }
 
-int Move::getIsKingSideCastle() {
-    return (state & KING_SIDE_CASTLE_MASK) >> 19;
+bool Move::getIsBigPawnMove() {
+    return (state & IS_BIG_PAWN_MOVE_MASK) >> IS_BIG_PAWN_MOVE_SHIFT;
 }
 
-int Move::getIsQueenSideCastle() {
-    return (state & QUEEN_SIDE_CASTLE_MASK) >> 18;
+bool Move::getIsEnPassent() {
+    return (state & IS_EN_PASSENT_MASK) >> IS_EN_PASSENT_SHIFT;
 }
 
-int Move::getPromotionPiece() { return (state & PROMOTION_MASK) >> 20; }
+bool Move::getIsKingSideCastle() {
+    return (state & KING_SIDE_CASTLE_MASK) >> KING_SIDE_CASTLE_SHIFT;
+}
 
-int Move::getIsEnPassent() { return getEnPassentSquare() != 0; }
+bool Move::getIsQueenSideCastle() {
+    return (state & QUEEN_SIDE_CASTLE_MASK) >> QUEEN_SIDE_CASTLE_SHIFT;
+}
+
+int Move::getPromotionPiece() {
+    return (state & PROMOTION_MASK) >> PROMOTION_SHIFT;
+}
 
 std::string Move::toString() {
     std::string str = "";
@@ -49,34 +55,43 @@ std::string Move::toString() {
     return str;
 }
 
-int Move::getPieceType() { return (state & PIECE_TYPE_MASK) >> 29; }
+int Move::getPieceType() {
+    return (state & PIECE_TYPE_MASK) >> PIECE_TYPE_SHIFT;
+}
 
-int Move::getCapturedPiece() { return (state & CAPTURED_PIECE_MASK) >> 24; }
+int Move::getCapturedPiece() {
+    return (state & CAPTURED_PIECE_MASK) >> CAPTURED_PIECE_SHIFT;
+}
 
 void Move::setPromotionPiece(char piece) {
     // clear the promotion bits
     state &= ~PROMOTION_MASK;
     // set the promotion bits
-    state = state | ((piece << 20) & PROMOTION_MASK);
+    state = state | ((piece << PROMOTION_SHIFT) & PROMOTION_MASK);
 }
 
-void Move::setEnPassentSquare(int square) {
-    // clear the en passent bits
-    state &= ~EN_PASSENT_SQUARE_MASK;
-    // set the en passent bits
-    state |= (square << 12) & EN_PASSENT_SQUARE_MASK;
+void Move::setIsBigPawnMove(int square) {
+    // clear the big pawn move bit
+    state &= ~IS_BIG_PAWN_MOVE_MASK;
+    // shift the square to the correct position and set the bit
+    state |= (square << IS_BIG_PAWN_MOVE_SHIFT) & IS_BIG_PAWN_MOVE_MASK;
+}
+
+void Move::setIsEnPassent(bool isEnPassent) {
+    state &= ~IS_EN_PASSENT_MASK;
+    state |= isEnPassent << IS_EN_PASSENT_SHIFT;
 }
 
 void Move::setQueenSideCastle(bool isQueenSideCastle) {
     state &= ~QUEEN_SIDE_CASTLE_MASK;
-    state |= isQueenSideCastle << 18;
+    state |= isQueenSideCastle << QUEEN_SIDE_CASTLE_SHIFT;
 }
 
 void Move::setKingSideCastle(bool isKingSideCastle) {
     // clear the king side castle bit
     state &= ~KING_SIDE_CASTLE_MASK;
     // shift the isKingSideCastle to the correct position and set the bit
-    state |= isKingSideCastle << 19;
+    state |= isKingSideCastle << KING_SIDE_CASTLE_SHIFT;
 }
 
 void Move::setStartSquare(int square) {
@@ -86,15 +101,15 @@ void Move::setStartSquare(int square) {
 
 void Move::setTargetSquare(int square) {
     state &= ~TARGET_SQUARE_MASK;
-    state |= (square << 6) & TARGET_SQUARE_MASK;
+    state |= (square << TARGET_SQUARE_SHIFT) & TARGET_SQUARE_MASK;
 }
 
 void Move::setCapturedPiece(int piece) {
     state &= ~CAPTURED_PIECE_MASK;
-    state |= (piece << 24) & CAPTURED_PIECE_MASK;
+    state |= (piece << CAPTURED_PIECE_SHIFT) & CAPTURED_PIECE_MASK;
 }
 
 void Move::setPieceType(int piece) {
     state &= ~PIECE_TYPE_MASK;
-    state |= (piece << 29) & PIECE_TYPE_MASK;
+    state |= (piece << PIECE_TYPE_SHIFT) & PIECE_TYPE_MASK;
 }

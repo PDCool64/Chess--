@@ -17,11 +17,13 @@ std::list<Move> MoveGenerator::generatePawnMoves(Board board, char square) {
         int bigPawnRank = white ? 1 : 6;
         // checks for the rank since
         // if you divide by 8 you get the rank
+        targetSquare = square + 16 * direction;
+
         if ((square / 8) == bigPawnRank &&
             board.pieces[targetSquare] == Piece::EMPTY) {
             // two square jump
-            targetSquare = square + 16 * direction;
             Move move = Move(square, targetSquare);
+            move.setIsBigPawnMove(true);
             moves.push_back(move);
         }
     }
@@ -37,6 +39,7 @@ std::list<Move> MoveGenerator::generatePawnMoves(Board board, char square) {
                 white) {
             Move move = Move(square, targetSquare);
             move.setCapturedPiece(board.pieces[targetSquare]);
+
             moves.push_back(move);
         }
     }
@@ -60,5 +63,36 @@ std::list<Move> MoveGenerator::generatePawnMoves(Board board, char square) {
 
     // TODO: Implement promotion
     // TODO: Implement en passant
+
+    if (board.enPassentSquare != 0) {
+        if (board.enPassentSquare == square + 8 * direction + 1 ||
+            board.enPassentSquare == square + 8 * direction - 1) {
+            targetSquare = board.enPassentSquare;
+            Move move = Move(square, targetSquare);
+            move.setIsEnPassent(true);
+            move.setCapturedPiece(Piece::PAWN);
+            moves.push_back(move);
+        }
+    }
+
+    int promotionRank = white ? 7 : 0;
+    if ((square / 8) == promotionRank) {
+        std::list <Move> newMoves;
+        for (Move m : moves) {
+            Move queenPromotion = m;
+            queenPromotion.setPromotionPiece(Piece::QUEEN);
+            Move rookPromotion = m;
+            rookPromotion.setPromotionPiece(Piece::ROOK);
+            Move bishopPromotion = m;
+            bishopPromotion.setPromotionPiece(Piece::BISHOP);
+            Move knightPromotion = m;
+            knightPromotion.setPromotionPiece(Piece::KNIGHT);
+            newMoves.push_back(queenPromotion);
+            newMoves.push_back(rookPromotion);
+            newMoves.push_back(bishopPromotion);
+            newMoves.push_back(knightPromotion);
+        }
+    }
+
     return moves;
 }

@@ -34,10 +34,35 @@ void Board::readFen(const std::string& fen) {
     // 3. Parse castling availability
     iss >> field;
     // Set flags based on field
+    if (field == "-")
+        flags = 0;
+    else {
+        flags = 0;
+        for (char c : field) {
+            switch (c) {
+                case 'K':
+                    flags |= WHITE_KING_SIDE_CASTLE;
+                    break;
+                case 'Q':
+                    flags |= WHITE_QUEEN_SIDE_CASTLE;
+                    break;
+                case 'k':
+                    flags |= BLACK_KING_SIDE_CASTLE;
+                    break;
+                case 'q':
+                    flags |= BLACK_QUEEN_SIDE_CASTLE;
+                    break;
+            }
+        }
+    }
 
     // 4. Parse en passant target square
     iss >> field;
     // Set enPassentSquare based on field
+    if (field == "-")
+        enPassentSquare = 0;
+    else
+        enPassentSquare = stringToField(field);
 
     // 5. Parse halfmove clock
     iss >> plySinceLastPawnMoveOrCapture;
@@ -47,8 +72,10 @@ void Board::readFen(const std::string& fen) {
 }
 
 std::string Board::fieldToString(int square) {
-    std::string str = "";
-    str += 'a' + square % 8;
-    str += '1' + square / 8;
-    return str;
+    return std::string(1, 'a' + (square % 8)) +
+           std::to_string(1 + (square / 8));
+}
+
+int Board::stringToField(const std::string& str) {
+    return (str[0] - 'a') + 8 * (str[1] - '1');
 }

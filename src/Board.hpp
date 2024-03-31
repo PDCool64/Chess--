@@ -19,4 +19,10 @@ class Board {
     int enPassentSquare;
     void readFen(const std::string& fen);
     static std::string fieldToString(int square);
+    static int stringToField(const std::string& str);
+
+    static const int WHITE_KING_SIDE_CASTLE = 1;
+    static const int WHITE_QUEEN_SIDE_CASTLE = 1 << 1;
+    static const int BLACK_KING_SIDE_CASTLE = 1 << 2;
+    static const int BLACK_QUEEN_SIDE_CASTLE = 1 << 3;
 };
