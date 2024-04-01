@@ -71,9 +71,9 @@ class Move {
 
     void setIsEnPassent(bool);
 
-    void setQueenSideCastle(bool isQueenSideCastle);
+    void setIsQueenSideCastle(bool isQueenSideCastle);
 
-    void setKingSideCastle(bool isKingSideCastle);
+    void setIsKingSideCastle(bool isKingSideCastle);
 
     void setStartSquare(int square);
 

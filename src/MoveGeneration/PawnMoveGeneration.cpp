@@ -24,6 +24,7 @@ std::list<Move> MoveGenerator::generatePawnMoves(Board board, char square) {
             // two square jump
             Move move = Move(square, targetSquare);
             move.setIsBigPawnMove(true);
+            move.setPieceType(Piece::PAWN);
             moves.push_back(move);
         }
     }

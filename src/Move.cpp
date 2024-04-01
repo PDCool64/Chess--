@@ -49,8 +49,10 @@ std::string Move::toString() {
         return "O-O";
     if (getIsQueenSideCastle())
         return "O-O-O";
+    if(getPieceType() != Piece::PAWN) {
+        str += Piece::toChar(getPieceType());
+    }
     str += Board::fieldToString(getStartSqare());
-    str += " ";
     str += Board::fieldToString(getTargetSquare());
     return str;
 }
@@ -82,12 +84,12 @@ void Move::setIsEnPassent(bool isEnPassent) {
     state |= isEnPassent << IS_EN_PASSENT_SHIFT;
 }
 
-void Move::setQueenSideCastle(bool isQueenSideCastle) {
+void Move::setIsQueenSideCastle(bool isQueenSideCastle) {
     state &= ~QUEEN_SIDE_CASTLE_MASK;
     state |= isQueenSideCastle << QUEEN_SIDE_CASTLE_SHIFT;
 }
 
-void Move::setKingSideCastle(bool isKingSideCastle) {
+void Move::setIsKingSideCastle(bool isKingSideCastle) {
     // clear the king side castle bit
     state &= ~KING_SIDE_CASTLE_MASK;
     // shift the isKingSideCastle to the correct position and set the bit

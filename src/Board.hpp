@@ -18,6 +18,7 @@ class Board {
     int fullMoveCounter;
     int enPassentSquare;
     void readFen(const std::string& fen);
+    bool isAttacked(int square, bool white);
     static std::string fieldToString(int square);
     static int stringToField(const std::string& str);
 
@@ -25,4 +26,6 @@ class Board {
     static const int WHITE_QUEEN_SIDE_CASTLE = 1 << 1;
     static const int BLACK_KING_SIDE_CASTLE = 1 << 2;
     static const int BLACK_QUEEN_SIDE_CASTLE = 1 << 3;
+    static constexpr int rank(int square) { return square / 8; }
+    static constexpr int file(int square) { return square % 8; }
 };

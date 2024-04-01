@@ -1,4 +1,5 @@
 #include "Board.hpp"
+#include "MoveGenerator.hpp"
 
 #include <iostream>
 
@@ -72,10 +73,25 @@ void Board::readFen(const std::string& fen) {
 }
 
 std::string Board::fieldToString(int square) {
-    return std::string(1, 'a' + (square % 8)) +
-           std::to_string(1 + (square / 8));
+    return std::string(1, 'a' + Board::file(square)) +
+           std::to_string(1 + Board::rank(square));
 }
 
 int Board::stringToField(const std::string& str) {
     return (str[0] - 'a') + 8 * (str[1] - '1');
+}
+
+bool Board::isAttacked(int square, bool white) {
+    // invert the color since we want to check if the square is attacked by the
+    // opposite color
+    whiteActive = !whiteActive;
+    std::list<Move> moves = MoveGenerator::generateMoves(*this);
+    for (Move m : moves) {
+        if (m.getTargetSquare() == square) {
+            whiteActive = !whiteActive;
+            return true;
+        }
+    }
+    whiteActive = !whiteActive;
+    return false;
 }

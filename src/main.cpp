@@ -43,8 +43,11 @@ int main() {
         "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 5";
     std::string castlingPos =
         "rnbqkbn1/ppp1p1pr/8/3pPp1p/8/8/PPPP1PPP/RNBQKBNR w q - 2 7";
+    std::string castlingPos2 =
+        "rnbqk1nr/pppp1ppp/8/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 "
+        "4";
     Board board;
-    board.readFen(castlingPos);
+    board.readFen(castlingPos2);
     printBoard(board);
     std::list<Move> moves = MoveGenerator::generateMoves(board);
     std::cout << "Generated " << moves.size() << " moves" << std::endl;
