@@ -19,4 +19,5 @@ class MoveGenerator {
     static std::list<Move> generateStraightMoves(Board board, char square);
     static std::list<Move> generateStraightMoves(Board board, char square, int limit);
     static std::list<Move> generateKingMoves(Board board, char square);
+    static std::list<Move> generateLegalMoves(Board board);
 };

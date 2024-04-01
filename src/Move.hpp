@@ -45,7 +45,7 @@ class Move {
 
 
 
-    int getStartSqare();
+    int getStartSquare();
 
     int getTargetSquare();
 

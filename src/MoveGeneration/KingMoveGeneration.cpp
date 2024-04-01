@@ -14,7 +14,7 @@ std::list<Move> MoveGenerator::generateKingMoves(Board board, char square) {
     // if the color is black, then we need to shift the flags to the right so we
     // can use the same masks for both colors
     if (!white)
-        flags >> 2;
+        flags = flags >> 2;
     // check if there are any castling rights
     if (!(flags & 3))
         return moves;

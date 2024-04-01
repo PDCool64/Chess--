@@ -9,7 +9,8 @@ std::list<Move> MoveGenerator::generateMoves(Board board) {
         if (board.pieces[i] == Piece::EMPTY) {
             continue;
         }
-        if (((board.pieces[i] & Piece::WHITE) == Piece::WHITE) != board.whiteActive) {
+        if (((board.pieces[i] & Piece::WHITE) == Piece::WHITE) !=
+            board.whiteActive) {
             continue;
         }
         std::list<Move> temp;
@@ -67,4 +68,24 @@ std::list<Move> MoveGenerator::generateMoves(Board board) {
         }
     }
     return moves;
+}
+
+std::list<Move> MoveGenerator::generateLegalMoves(Board board) {
+    std::list<Move> moves = generateMoves(board);
+    std::list<Move> legalMoves;
+    for (Move move : moves) {
+        Board newBoard = board;
+        newBoard.make(move);
+        if ((board.pieces[move.getStartSquare()] & Piece::PIECE_MASK) ==
+            Piece::KING) {
+            newBoard.printBoard();
+            std::cout << "Checking if in check" << std::endl;
+            std::cout << newBoard.isInCheck(board.whiteActive) << std::endl;
+        }
+
+        if (!newBoard.isInCheck(board.whiteActive)) {
+            legalMoves.push_back(move);
+        }
+    }
+    return legalMoves;
 }

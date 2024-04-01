@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Piece.hpp"
+#include "Move.hpp"
 
 class Board {
    public:
@@ -18,7 +19,11 @@ class Board {
     int fullMoveCounter;
     int enPassentSquare;
     void readFen(const std::string& fen);
+    void make(Move move);
+    void unmake(Move move);
     bool isAttacked(int square, bool white);
+    bool isInCheck(bool white);
+    void printBoard();
     static std::string fieldToString(int square);
     static int stringToField(const std::string& str);
 

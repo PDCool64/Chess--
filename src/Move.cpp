@@ -17,7 +17,7 @@ Move::Move(int startSqare, int targetSqare, int pieceType) {
 
 Move::~Move() {}
 
-int Move::getStartSqare() { return state & STARTSQUARE_MASK; }
+int Move::getStartSquare() { return state & STARTSQUARE_MASK; }
 
 int Move::getTargetSquare() {
     return (state & TARGET_SQUARE_MASK) >> TARGET_SQUARE_SHIFT;
@@ -52,7 +52,7 @@ std::string Move::toString() {
     if(getPieceType() != Piece::PAWN) {
         str += Piece::toChar(getPieceType());
     }
-    str += Board::fieldToString(getStartSqare());
+    str += Board::fieldToString(getStartSquare());
     str += Board::fieldToString(getTargetSquare());
     return str;
 }
