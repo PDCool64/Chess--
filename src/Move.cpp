@@ -49,11 +49,16 @@ std::string Move::toString() {
         return "O-O";
     if (getIsQueenSideCastle())
         return "O-O-O";
-    if(getPieceType() != Piece::PAWN) {
-        str += Piece::toChar(getPieceType());
-    }
+    // if(getPieceType() != Piece::PAWN) {
+    //     str += Piece::toChar(getPieceType());
+    // }
+
     str += Board::fieldToString(getStartSquare());
     str += Board::fieldToString(getTargetSquare());
+    if (getPromotionPiece() != Piece::EMPTY) {
+        str += Piece::toChar(getPromotionPiece()) + 32;
+        return str;
+    }
     return str;
 }
 

@@ -1,17 +1,43 @@
 #include "../MoveGenerator.hpp"
 
+std::list<Move> generatePromotionMoves(Move move) {
+    Move queenPromotion = move;
+    Move rookPromotion = move;
+    Move bishopPromotion = move;
+    Move knightPromotion = move;
+
+    queenPromotion.setPromotionPiece(Piece::QUEEN);
+    rookPromotion.setPromotionPiece(Piece::ROOK);
+    bishopPromotion.setPromotionPiece(Piece::BISHOP);
+    knightPromotion.setPromotionPiece(Piece::KNIGHT);
+
+    std::list<Move> moves;
+    moves.push_back(queenPromotion);
+    moves.push_back(rookPromotion);
+    moves.push_back(bishopPromotion);
+    moves.push_back(knightPromotion);
+
+    return moves;
+}
+
 std::list<Move> MoveGenerator::generatePawnMoves(Board board, char square) {
     char piece = board.pieces[square];
     std::list<Move> moves;
     // White pawn
     bool white = piece & Piece::WHITE;
+    int promotionRank = white ? 7 : 0;
 
     int direction = white ? 1 : -1;
     // check one square infront of the pawn
     int targetSquare = square + 8 * direction;
     if (board.pieces[targetSquare] == Piece::EMPTY) {
         Move move = Move(square, targetSquare);
-        moves.push_back(move);
+        move.setPieceType(Piece::PAWN);
+        if ((targetSquare / 8) == promotionRank) {
+            moves.splice(moves.end(), generatePromotionMoves(move));
+        } else {
+            moves.push_back(move);
+        }
         // if pawn is white and on rank 2 or black and on rank 7
         // they can move two squares
         int bigPawnRank = white ? 1 : 6;
@@ -40,8 +66,11 @@ std::list<Move> MoveGenerator::generatePawnMoves(Board board, char square) {
                 white) {
             Move move = Move(square, targetSquare);
             move.setCapturedPiece(board.pieces[targetSquare]);
-
-            moves.push_back(move);
+            if ((targetSquare / 8) == promotionRank) {
+                moves.splice(moves.end(), generatePromotionMoves(move));
+            } else {
+                moves.push_back(move);
+            }
         }
     }
 
@@ -55,7 +84,11 @@ std::list<Move> MoveGenerator::generatePawnMoves(Board board, char square) {
                 white) {
             Move move = Move(square, targetSquare);
             move.setCapturedPiece(board.pieces[targetSquare]);
-            moves.push_back(move);
+            if ((targetSquare / 8) == promotionRank) {
+                moves.splice(moves.end(), generatePromotionMoves(move));
+            } else {
+                moves.push_back(move);
+            }
         }
     }
 
@@ -63,35 +96,18 @@ std::list<Move> MoveGenerator::generatePawnMoves(Board board, char square) {
     //           << Board::fieldToString(square) << std::endl;
 
     // TODO: Implement promotion
-    // TODO: Implement en passant
 
     if (board.enPassentSquare != 0) {
         if (board.enPassentSquare == square + 8 * direction + 1 ||
             board.enPassentSquare == square + 8 * direction - 1) {
-            targetSquare = board.enPassentSquare;
-            Move move = Move(square, targetSquare);
-            move.setIsEnPassent(true);
-            move.setCapturedPiece(Piece::PAWN);
-            moves.push_back(move);
-        }
-    }
-
-    int promotionRank = white ? 7 : 0;
-    if ((square / 8) == promotionRank) {
-        std::list <Move> newMoves;
-        for (Move m : moves) {
-            Move queenPromotion = m;
-            queenPromotion.setPromotionPiece(Piece::QUEEN);
-            Move rookPromotion = m;
-            rookPromotion.setPromotionPiece(Piece::ROOK);
-            Move bishopPromotion = m;
-            bishopPromotion.setPromotionPiece(Piece::BISHOP);
-            Move knightPromotion = m;
-            knightPromotion.setPromotionPiece(Piece::KNIGHT);
-            newMoves.push_back(queenPromotion);
-            newMoves.push_back(rookPromotion);
-            newMoves.push_back(bishopPromotion);
-            newMoves.push_back(knightPromotion);
+            if (Board::file(board.enPassentSquare) == Board::file(square) + 1 ||
+                Board::file(board.enPassentSquare) == Board::file(square) - 1) {
+                targetSquare = board.enPassentSquare;
+                Move move = Move(square, targetSquare);
+                move.setIsEnPassent(true);
+                move.setCapturedPiece(Piece::PAWN);
+                moves.push_back(move);
+            }
         }
     }
 

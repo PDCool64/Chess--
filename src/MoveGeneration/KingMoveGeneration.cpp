@@ -10,7 +10,7 @@ std::list<Move> MoveGenerator::generateKingMoves(Board board, char square) {
     // castling
     char piece = board.pieces[square];
     bool white = piece & Piece::WHITE;
-    char flags = board.flags;
+    char flags = board.state.flags;
     // if the color is black, then we need to shift the flags to the right so we
     // can use the same masks for both colors
     if (!white)

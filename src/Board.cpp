@@ -37,22 +37,22 @@ void Board::readFen(const std::string& fen) {
     iss >> field;
     // Set flags based on field
     if (field == "-")
-        flags = 0;
+        state.flags = 0;
     else {
-        flags = 0;
+        state.flags = 0;
         for (char c : field) {
             switch (c) {
                 case 'K':
-                    flags |= WHITE_KING_SIDE_CASTLE;
+                    state.flags |= WHITE_KING_SIDE_CASTLE;
                     break;
                 case 'Q':
-                    flags |= WHITE_QUEEN_SIDE_CASTLE;
+                    state.flags |= WHITE_QUEEN_SIDE_CASTLE;
                     break;
                 case 'k':
-                    flags |= BLACK_KING_SIDE_CASTLE;
+                    state.flags |= BLACK_KING_SIDE_CASTLE;
                     break;
                 case 'q':
-                    flags |= BLACK_QUEEN_SIDE_CASTLE;
+                    state.flags |= BLACK_QUEEN_SIDE_CASTLE;
                     break;
             }
         }
@@ -67,10 +67,64 @@ void Board::readFen(const std::string& fen) {
         enPassentSquare = stringToField(field);
 
     // 5. Parse halfmove clock
-    iss >> plySinceLastPawnMoveOrCapture;
+    iss >> state.plySinceLastPawnMoveOrCapture;
 
     // 6. Parse fullmove number
     iss >> fullMoveCounter;
+}
+
+std::string Board::getFen() {
+    std::string fen = "";
+    int emptyCounter = 0;
+    for (int i = 7; i >= 0; --i) {
+        for (int j = 0; j < 8; j++) {
+            if (pieces[i * 8 + j] == Piece::EMPTY) {
+                emptyCounter++;
+            } else {
+                if (emptyCounter != 0) {
+                    fen += std::to_string(emptyCounter);
+                    emptyCounter = 0;
+                }
+                fen += Piece::toChar(pieces[i * 8 + j]);
+            }
+        }
+        if (emptyCounter != 0) {
+            fen += std::to_string(emptyCounter);
+            emptyCounter = 0;
+        }
+        if (i != 0) {
+            fen += "/";
+        }
+    }
+    fen += whiteActive ? " w " : " b ";
+    if (state.flags == 0) {
+        fen += "-";
+    } else {
+        if (state.flags & WHITE_KING_SIDE_CASTLE) {
+            fen += "K";
+        }
+        if (state.flags & WHITE_QUEEN_SIDE_CASTLE) {
+            fen += "Q";
+        }
+        if (state.flags & BLACK_KING_SIDE_CASTLE) {
+            fen += "k";
+        }
+        if (state.flags & BLACK_QUEEN_SIDE_CASTLE) {
+            fen += "q";
+        }
+    }
+    fen += " ";
+    if (enPassentSquare == 0) {
+        fen += "-";
+    } else {
+        fen += fieldToString(enPassentSquare);
+    }
+    fen += " ";
+    fen += std::to_string(state.plySinceLastPawnMoveOrCapture);
+    fen += " ";
+    fen += std::to_string(fullMoveCounter);
+    return fen;
+
 }
 
 std::string Board::fieldToString(int square) {
@@ -111,6 +165,8 @@ bool Board::isInCheck(bool white) {
 }
 
 void Board::make(Move move) {
+    stateHistory.push(state);
+
     pieces[move.getTargetSquare()] = pieces[move.getStartSquare()];
     pieces[move.getStartSquare()] = Piece::EMPTY;
 
@@ -136,34 +192,34 @@ void Board::make(Move move) {
 
     // castling rights
     if (move.getStartSquare() == 0 || move.getTargetSquare() == 0) {
-        flags &= ~WHITE_QUEEN_SIDE_CASTLE;
+        state.flags &= ~WHITE_QUEEN_SIDE_CASTLE;
     }
     if (move.getStartSquare() == 7 || move.getTargetSquare() == 7) {
-        flags &= ~WHITE_KING_SIDE_CASTLE;
+        state.flags &= ~WHITE_KING_SIDE_CASTLE;
     }
     if (move.getStartSquare() == 56 || move.getTargetSquare() == 56) {
-        flags &= ~BLACK_QUEEN_SIDE_CASTLE;
+        state.flags &= ~BLACK_QUEEN_SIDE_CASTLE;
     }
     if (move.getStartSquare() == 63 || move.getTargetSquare() == 63) {
-        flags &= ~BLACK_KING_SIDE_CASTLE;
+        state.flags &= ~BLACK_KING_SIDE_CASTLE;
     }
 
     // update game state
     whiteActive = !whiteActive;
-    plySinceLastPawnMoveOrCapture++;
+    state.plySinceLastPawnMoveOrCapture++;
     fullMoveCounter += whiteActive;
 
     // promotion
     if (move.getPromotionPiece() != Piece::EMPTY) {
-        pieces[move.getTargetSquare()] = move.getPromotionPiece();
+        pieces[move.getTargetSquare()] = move.getPromotionPiece() | (whiteActive ? Piece::BLACK : Piece::WHITE);
     }
     // check for pawn move
     if (pieces[move.getTargetSquare()] == Piece::PAWN) {
-        plySinceLastPawnMoveOrCapture = 0;
+        state.plySinceLastPawnMoveOrCapture = 0;
     }
     // check for capture
     if (move.getCapturedPiece() != Piece::EMPTY) {
-        plySinceLastPawnMoveOrCapture = 0;
+        state.plySinceLastPawnMoveOrCapture = 0;
     }
 }
 
@@ -174,7 +230,7 @@ void Board::printBoard() {
         }
         std::cout << std::endl;
     }
-    std::cout << flags << std::endl;
+    std::cout << state.flags << std::endl;
     std::cout << "Color to move " << (whiteActive ? "white" : "black")
               << std::endl;
     std::cout << "En passent square "
@@ -182,12 +238,56 @@ void Board::printBoard() {
                                        : " - ")
               << std::endl;
     std::cout << "Ply since last pawn move or capture "
-              << plySinceLastPawnMoveOrCapture << std::endl;
+              << state.plySinceLastPawnMoveOrCapture << std::endl;
     std::cout << "Full move counter " << fullMoveCounter << std::endl;
     std::cout << "Castling rights: ";
-    std::cout << ((flags & Board::WHITE_KING_SIDE_CASTLE) ? "K" : "");
-    std::cout << ((flags & Board::WHITE_QUEEN_SIDE_CASTLE) ? "Q" : "");
-    std::cout << ((flags & Board::BLACK_KING_SIDE_CASTLE) ? "k" : "");
-    std::cout << ((flags & Board::BLACK_QUEEN_SIDE_CASTLE) ? "q" : "");
+    std::cout << ((state.flags & Board::WHITE_KING_SIDE_CASTLE) ? "K" : "");
+    std::cout << ((state.flags & Board::WHITE_QUEEN_SIDE_CASTLE) ? "Q" : "");
+    std::cout << ((state.flags & Board::BLACK_KING_SIDE_CASTLE) ? "k" : "");
+    std::cout << ((state.flags & Board::BLACK_QUEEN_SIDE_CASTLE) ? "q" : "");
     std::cout << std::endl;
+    std::cout << "Fen: " << getFen() << std::endl;
+}
+
+void Board::unmake(Move move) {
+    state = stateHistory.top();
+    stateHistory.pop();
+
+    pieces[move.getStartSquare()] = pieces[move.getTargetSquare()];
+    pieces[move.getTargetSquare()] = move.getCapturedPiece();
+    bool white = !whiteActive;
+     
+    if (move.getPromotionPiece() != Piece::EMPTY) {
+        pieces[move.getStartSquare()] = Piece::PAWN | (white ? Piece::WHITE : Piece::BLACK);
+    }
+
+    if (move.getCapturedPiece() != Piece::EMPTY) {
+        pieces[move.getTargetSquare()] |= (white ? Piece::BLACK : Piece::WHITE);
+    }
+
+    int direction = white ? 1 : -1;
+    // en passent
+    if (move.getIsEnPassent()) {
+        // set the en passent square
+        enPassentSquare = move.getTargetSquare();
+        // reset the captured pawn
+        pieces[enPassentSquare - 8 * direction] =
+            Piece::PAWN | (white ? Piece::BLACK : Piece::WHITE);
+    }
+
+    // castling
+
+    if (move.getIsKingSideCastle()) {
+        int rank = Board::rank(move.getTargetSquare());
+        pieces[7 + rank * 8] = pieces[5 + rank * 8];
+        pieces[5 + rank * 8] = Piece::EMPTY;
+    } else if (move.getIsQueenSideCastle()) {
+        int rank = Board::rank(move.getTargetSquare());
+        pieces[0 + rank * 8] = pieces[3 + rank * 8];
+        pieces[3 + rank * 8] = Piece::EMPTY;
+    }
+
+        
+    fullMoveCounter -= whiteActive;
+    whiteActive = !whiteActive;
 }

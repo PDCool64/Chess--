@@ -76,13 +76,6 @@ std::list<Move> MoveGenerator::generateLegalMoves(Board board) {
     for (Move move : moves) {
         Board newBoard = board;
         newBoard.make(move);
-        if ((board.pieces[move.getStartSquare()] & Piece::PIECE_MASK) ==
-            Piece::KING) {
-            newBoard.printBoard();
-            std::cout << "Checking if in check" << std::endl;
-            std::cout << newBoard.isInCheck(board.whiteActive) << std::endl;
-        }
-
         if (!newBoard.isInCheck(board.whiteActive)) {
             legalMoves.push_back(move);
         }

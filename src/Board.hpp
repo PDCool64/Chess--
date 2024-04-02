@@ -2,23 +2,30 @@
 
 #include <iostream>
 #include <sstream>
+#include <stack>
 #include <string>
 
-#include "Piece.hpp"
 #include "Move.hpp"
+#include "Piece.hpp"
 
 class Board {
+    class State {
+       public:
+        uint8_t flags = 0;
+        int plySinceLastPawnMoveOrCapture;
+    };
+
    public:
     Board();
     ~Board();
-    // 0: empty, 1: white, 2: black
     uint8_t pieces[64] = {0};
-    uint8_t flags = 0;
-    bool whiteActive;
-    int plySinceLastPawnMoveOrCapture;
+    State state;
+    std::stack<State> stateHistory;
     int fullMoveCounter;
     int enPassentSquare;
+    bool whiteActive;
     void readFen(const std::string& fen);
+    std::string getFen();
     void make(Move move);
     void unmake(Move move);
     bool isAttacked(int square, bool white);

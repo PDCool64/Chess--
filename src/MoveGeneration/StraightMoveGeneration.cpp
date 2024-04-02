@@ -14,15 +14,25 @@ std::list<Move> MoveGenerator::generateStraightMoves(Board board, char square,
     for (int offset : offsets) {
         for (int i = 1; i <= limit; ++i) {
             int targetSquare = square + offset * i;
+            
+            // Make sure that each offset iteration 
+            // does not wrap around and go to the other side of the board
+            // in case it hits a valid square 
+            // which would then be counted twice
+            if (offset == -1 && targetSquare % 8 == 7) {
+                break;
+            }
+            if (offset == 1 && targetSquare % 8 == 0) {
+                break;
+            }
+            if (offset == -8 && targetSquare < 0) {
+                break;
+            }
+            if (offset == 8 && targetSquare > 63) {
+                break;
+            }
             // Make sure the target square is on the board
             if (targetSquare < 0 || targetSquare > 63) {
-                continue;
-            }
-            // Make sure the target square is on one axis the same 
-            // because otherwise it would have been over the edge of the board
-            // and wrapped around in another row
-            if ((targetSquare % 8 != square % 8) &&
-                (targetSquare / 8 != square / 8)) {
                 continue;
             }
             // Moves to empty squares
@@ -31,8 +41,7 @@ std::list<Move> MoveGenerator::generateStraightMoves(Board board, char square,
                 moves.push_back(move);
             } else {
                 if (!Piece::isSameColor(piece, board.pieces[targetSquare])) {
-                    Move move =
-                        Move(square, targetSquare, board.pieces[targetSquare]);
+                    Move move(square, targetSquare, board.pieces[targetSquare]);
                     move.setCapturedPiece(board.pieces[targetSquare]);
                     moves.push_back(move);
                 }
