@@ -8,6 +8,35 @@ Board::Board() {}
 
 Board::~Board() {}
 
+void Board::setUpKingSquares() {
+    for (int i = 0; i < 64; ++i) {
+        if (pieces[i] == (Piece::KING | Piece::WHITE)) {
+            whiteKingSquare = i;
+        }
+        if (pieces[i] == (Piece::KING | Piece::BLACK)) {
+            blackKingSquare = i;
+        }
+    }
+
+    std::cout << "White king square: " << whiteKingSquare << std::endl;
+    std::cout << "Black king square: " << blackKingSquare << std::endl;
+}
+
+void Board::setUpAttackedSquares() {
+    bool white = whiteActive;
+    whiteActive = true;
+    std::list<Move> whiteMoves = MoveGenerator::generateMoves(*this);
+    for (Move m : whiteMoves) {
+        attackedByWhite |= 1 << m.getTargetSquare();
+    }
+    whiteActive = false;
+    std::list<Move> blackMoves = MoveGenerator::generateMoves(*this);
+    for (Move m : blackMoves) {
+        attackedByBlack |= 1 << m.getTargetSquare();
+    }
+    whiteActive = white;
+}
+
 void Board::readFen(const std::string& fen) {
     std::istringstream iss(fen);
     std::string field;
@@ -28,6 +57,8 @@ void Board::readFen(const std::string& fen) {
             ++file;
         }
     }
+
+    setUpKingSquares();
 
     // 2. Parse active color
     iss >> field;
@@ -124,7 +155,6 @@ std::string Board::getFen() {
     fen += " ";
     fen += std::to_string(fullMoveCounter);
     return fen;
-
 }
 
 std::string Board::fieldToString(int square) {
@@ -137,30 +167,12 @@ int Board::stringToField(const std::string& str) {
 }
 
 bool Board::isAttacked(int square, bool white) {
-    // invert the color since we want to check if the square is attacked by the
-    // opposite color
-    bool temp = whiteActive;
-    whiteActive = !white;
-    std::list<Move> moves = MoveGenerator::generateMoves(*this);
-    for (Move m : moves) {
-        if (m.getTargetSquare() == square) {
-            whiteActive = !whiteActive;
-            return true;
-        }
-    }
-    whiteActive = temp;
-    return false;
+    uint64_t attackers = white ? attackedByWhite : attackedByBlack;
+    return (attackers >> square) & 1;
 }
 
 bool Board::isInCheck(bool white) {
-    int kingSquare = 0;
-    for (int i = 0; i < 64; i++) {
-        if (pieces[i] ==
-            (white ? Piece::KING | Piece::WHITE : Piece::KING | Piece::BLACK)) {
-            kingSquare = i;
-            break;
-        }
-    }
+    int kingSquare = white ? whiteKingSquare : blackKingSquare;
     return isAttacked(kingSquare, white);
 }
 
@@ -169,6 +181,14 @@ void Board::make(Move move) {
 
     pieces[move.getTargetSquare()] = pieces[move.getStartSquare()];
     pieces[move.getStartSquare()] = Piece::EMPTY;
+
+    // update the king square
+    if (pieces[move.getTargetSquare()] == (Piece::KING | Piece::WHITE)) {
+        whiteKingSquare = move.getTargetSquare();
+    }
+    if (pieces[move.getTargetSquare()] == (Piece::KING | Piece::BLACK)) {
+        blackKingSquare = move.getTargetSquare();
+    }
 
     int direction = whiteActive ? 1 : -1;
 
@@ -211,7 +231,9 @@ void Board::make(Move move) {
 
     // promotion
     if (move.getPromotionPiece() != Piece::EMPTY) {
-        pieces[move.getTargetSquare()] = move.getPromotionPiece() | (whiteActive ? Piece::BLACK : Piece::WHITE);
+        pieces[move.getTargetSquare()] =
+            move.getPromotionPiece() |
+            (whiteActive ? Piece::BLACK : Piece::WHITE);
     }
     // check for pawn move
     if (pieces[move.getTargetSquare()] == Piece::PAWN) {
@@ -255,10 +277,20 @@ void Board::unmake(Move move) {
 
     pieces[move.getStartSquare()] = pieces[move.getTargetSquare()];
     pieces[move.getTargetSquare()] = move.getCapturedPiece();
+
+    // update the king square
+    if (pieces[move.getStartSquare()] == (Piece::KING | Piece::WHITE)) {
+        whiteKingSquare = move.getStartSquare();
+    }
+    if (pieces[move.getStartSquare()] == (Piece::KING | Piece::BLACK)) {
+        blackKingSquare = move.getStartSquare();
+    }
+
     bool white = !whiteActive;
-     
+
     if (move.getPromotionPiece() != Piece::EMPTY) {
-        pieces[move.getStartSquare()] = Piece::PAWN | (white ? Piece::WHITE : Piece::BLACK);
+        pieces[move.getStartSquare()] =
+            Piece::PAWN | (white ? Piece::WHITE : Piece::BLACK);
     }
 
     if (move.getCapturedPiece() != Piece::EMPTY) {
@@ -287,7 +319,6 @@ void Board::unmake(Move move) {
         pieces[3 + rank * 8] = Piece::EMPTY;
     }
 
-        
     fullMoveCounter -= whiteActive;
     whiteActive = !whiteActive;
 }

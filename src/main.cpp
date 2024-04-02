@@ -43,6 +43,12 @@ int main() {
     Move move(8, 24);
     std::string startpos =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    std::string startpos_e2e4 =
+        "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
+    std::string startpos_e2e4_e7e5 =
+        "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
+    std::string startpos_e2e4_e7e5_f1b5 =
+        "rnbqkbnr/pppp1ppp/8/1B2p3/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2";
     std::string pawnCapturePos =
         "rnbqkbnr/ppppp1pp/8/5p2/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
     std::string pawnCapturePos2 =
@@ -85,7 +91,7 @@ int main() {
     std::string trickyPos_h2h4_d8a5_c2c3 =
         "rnb2k1r/pp1Pbppp/2p5/q7/2B4P/2P5/PP2NnP1/RNBQK2R b KQ - 0 9";
     Board board;
-    board.readFen(startpos);
+    board.readFen(startpos_e2e4_e7e5_f1b5);
     board.printBoard();
-    fn(board, 4);
+    fn(board, 1);
 }
