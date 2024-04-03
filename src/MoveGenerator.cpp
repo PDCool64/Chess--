@@ -30,27 +30,21 @@ std::list<Move> MoveGenerator::generateMoves(Board board) {
                 moves.splice(moves.end(), temp);
                 break;
             case Piece::BISHOP:
-                temp = generateDiagonalMoves(board, i);
+                temp = generateSlidingMoves(board, true, false, false, i);
                 for (Move& move : temp) {
                     move.setPieceType(Piece::BISHOP);
                 }
                 moves.splice(moves.end(), temp);
                 break;
             case Piece::ROOK:
-                temp = generateStraightMoves(board, i);
+                temp = generateSlidingMoves(board, false, true, false, i);
                 for (Move& move : temp) {
                     move.setPieceType(Piece::ROOK);
                 }
                 moves.splice(moves.end(), temp);
                 break;
             case Piece::QUEEN:
-                temp = generateDiagonalMoves(board, i);
-                for (Move& move : temp) {
-                    move.setPieceType(Piece::QUEEN);
-                }
-                moves.splice(moves.end(), temp);
-
-                temp = generateStraightMoves(board, i);
+                temp = generateSlidingMoves(board, true, true, false, i);
                 for (Move& move : temp) {
                     move.setPieceType(Piece::QUEEN);
                 }

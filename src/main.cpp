@@ -91,7 +91,7 @@ int main() {
     std::string trickyPos_h2h4_d8a5_c2c3 =
         "rnb2k1r/pp1Pbppp/2p5/q7/2B4P/2P5/PP2NnP1/RNBQK2R b KQ - 0 9";
     Board board;
-    board.readFen(startpos_e2e4_e7e5_f1b5);
+    board.readFen(startpos);
     board.printBoard();
-    fn(board, 1);
+    fn(board, 4);
 }

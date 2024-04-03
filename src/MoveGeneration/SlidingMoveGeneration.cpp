@@ -1,39 +1,37 @@
 #include "../MoveGenerator.hpp"
 
-std::list<Move> MoveGenerator::generateStraightMoves(Board board, char square) {
-    return generateStraightMoves(board, square, 8);
-}
-
-// limit is the maximum number of squares the move can go
-// the king can only move one square in any direction so the limit is 1
-std::list<Move> MoveGenerator::generateStraightMoves(Board board, char square,
-                                                     int limit) {
+std::list<Move> MoveGenerator::generateSlidingMoves(Board board, bool diagonal,
+                                                    bool straight,
+                                                    bool oneSquare,
+                                                    char square) {
     std::list<Move> moves;
-    int offsets[] = {-8, -1, 8, 1};
+    int offsets[] = {-9, -7, 7, 9, -8, 1, 8, -1};
+
+    int start = diagonal ? 0 : 4;
+    int end = straight ? 8 : 4;
+    int limit = oneSquare ? 1 : 8;
+
     char piece = board.pieces[square];
-    for (int offset : offsets) {
-        for (int i = 1; i <= limit; ++i) {
-            int targetSquare = square + offset * i;
-            
-            // Make sure that each offset iteration 
+    for (int i = start; i < end; ++i) {
+        for (int j = 1; j <= limit; ++j) {
+            int targetSquare = square + offsets[i] * j;
+
+            // Make sure that each offsets[i] iteration
             // does not wrap around and go to the other side of the board
-            // in case it hits a valid square 
+            // in case it hits a valid square
             // which would then be counted twice
-            if (offset == -1 && targetSquare % 8 == 7) {
+            if (std::abs(Board::rank(targetSquare) -
+                         Board::rank(targetSquare - offsets[i])) > 1) {
                 break;
             }
-            if (offset == 1 && targetSquare % 8 == 0) {
+            if (std::abs(Board::file(targetSquare) -
+                         Board::file(targetSquare - offsets[i])) > 1) {
                 break;
             }
-            if (offset == -8 && targetSquare < 0) {
-                break;
-            }
-            if (offset == 8 && targetSquare > 63) {
-                break;
-            }
+
             // Make sure the target square is on the board
             if (targetSquare < 0 || targetSquare > 63) {
-                continue;
+                break;
             }
             // Moves to empty squares
             if (board.pieces[targetSquare] == Piece::EMPTY) {

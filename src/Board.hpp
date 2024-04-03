@@ -18,6 +18,7 @@ class Board {
 
     void setUpKingSquares();
     void setUpAttackedSquares();
+    void setUpPinnedPieces();
 
 
     uint64_t attackedByWhite = 0;
